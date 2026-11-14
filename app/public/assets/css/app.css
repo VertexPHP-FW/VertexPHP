@@ -1,0 +1,7 @@
+html { scroll-behavior: smooth; }
+body { min-height: 100vh; display: flex; flex-direction: column; background: #f8fafc; }
+main { flex: 1; }
+footer { background: #fff; }
+.home-hero { background: #fff; border: 1px solid #e5e7eb; }
+.home-logo { width: min(60%, 260px); height: auto; }
+.home-tagline { color: #536078; }

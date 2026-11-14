@@ -1,0 +1,11 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Servir directamente los archivos y directorios públicos existentes.
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Enviar las demás solicitudes al router de la aplicación.
+    RewriteRule ^ index.php [L]
+</IfModule>
