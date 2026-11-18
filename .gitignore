@@ -3,5 +3,5 @@ npm-debug.log*
 otros/
 .env
 .env.example
-
+vendor/
 
