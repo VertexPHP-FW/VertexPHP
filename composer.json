@@ -1,0 +1,22 @@
+
+{
+    "name": "vertexphp-fw/vertexphp",
+    "description": "VertexPHP Framework - PHP application starter",
+    "type": "project",
+    "keywords": [
+        "php",
+        "framework",
+        "mvc",
+        "vertexphp"
+    ],
+    "homepage": "https://github.com/VertexPHP-FW/VertexPHP",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
