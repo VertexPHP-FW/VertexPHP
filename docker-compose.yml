@@ -60,4 +60,4 @@ networks:
 # Volúmenes
 volumes:
   vertexphp_db_data:
-    name: vertexphp_db_data
+    
