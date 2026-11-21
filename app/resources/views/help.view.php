@@ -17,16 +17,32 @@
 </table></div>
 <h2 class="h4 mt-4">Declarar rutas en <code>web.php</code></h2>
 <p>El recorrido de una petición tiene tres pasos: <code>app.php</code> carga <code>web.php</code>; <code>Router</code> compara el método HTTP y la URL con las rutas; y, al encontrar una coincidencia, llama al método indicado del controlador.</p>
-<p>En <code>app/routes/web.php</code>, cada declaración conecta un método HTTP, una URL y una acción de controlador. Importa las clases que usarás y declara cada ruta con <code>get()</code> o <code>post()</code>:</p>
+<p>En <code>app/routes/web.php</code>, cada declaración conecta un método HTTP, una URL y una acción de controlador. Importa las clases que usarás y declara cada ruta con <code>get()</code>, <code>post()</code>, <code>put()</code> o <code>delete()</code>:</p>
 <pre class="bg-light border rounded p-3"><code>use controllers\HelpController;
 use controllers\ContactController;
+use controllers\UserController;
 
 $router-&gt;get('/ayuda', [HelpController::class, 'index'])
        -&gt;name('help');
 
 $router-&gt;post('/contacto', [ContactController::class, 'send'])
-       -&gt;name('contact.submit');</code></pre>
-<p>La acción se escribe como <code>[NombreDelControlador::class, 'metodoPublico']</code>. Por ejemplo, <code>get()</code> registra una ruta GET y <code>post()</code> registra una ruta POST. El método del controlador atiende la petición. Cada ruta puede tener un nombre para generar enlaces; el router rechaza rutas duplicadas con el mismo método y URL.</p>
+       -&gt;name('contact.submit');
+
+$router-&gt;put('/usuarios/{id}', [UserController::class, 'update'])
+       -&gt;name('user.update');
+
+$router-&gt;delete('/usuarios/{id}', [UserController::class, 'delete'])
+       -&gt;name('user.delete');</code></pre>
+<p>La acción se escribe como <code>[NombreDelControlador::class, 'metodoPublico']</code>. El método del controlador atiende la petición y puede recibir los parámetros de la URL en un arreglo asociativo. Cada ruta puede tener un nombre para generar enlaces; el router rechaza rutas duplicadas con el mismo método y URL.</p>
+<p>Los formularios HTML solo envían GET o POST. Para enviar PUT o DELETE desde un formulario, usa POST e incluye un campo oculto <code>_method</code> con el valor <code>PUT</code> o <code>DELETE</code>. Desde JavaScript puedes enviar esos métodos directamente con Axios. Conserva la validación CSRF en las acciones que modifican datos.</p>
+<p>Para el ejemplo, instala Axios con <code>npm install axios</code> y agrega una URL base, por ejemplo <code>'users' =&gt; rtrim(BASE_URL, '/') . '/usuarios'</code>, al arreglo <code>APP_ROUTES</code> de <code>app/resources/layouts/main_foot.php</code>. En <code>app/resources/js/main.js</code> puedes enviar:</p>
+<pre class="bg-light border rounded p-3"><code>import axios from 'axios';
+
+const userUrl = `${app.routes.users}/${encodeURIComponent(userId)}`;
+
+await axios.put(userUrl, { nombre: 'Ada Lovelace' });
+await axios.delete(userUrl);</code></pre>
+<p>Axios envía el cuerpo de <code>PUT</code> como JSON. En el controlador, léelo con <code>json_decode(file_get_contents('php://input'), true)</code>. <code>DELETE</code> puede enviar el identificador en la URL, como en el ejemplo.</p>
 <h3 class="h5 mt-3">Parámetros en la URL</h3>
 <p>Un segmento entre llaves define un parámetro. El router lo entrega al controlador en un arreglo asociativo:</p>
 <pre class="bg-light border rounded p-3"><code>use controllers\UserController;

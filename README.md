@@ -4,8 +4,8 @@ VertexPHP es una base ligera para crear aplicaciones web con PHP, MySQL, Vue y V
 
 ## Requisitos
 
-- Git
-- PHP 8.2 o posterior y Composer 2
+- PHP 8.2 o posterior
+- Composer 2
 - Node.js 22.12 o posterior y npm
 - Docker con Docker Compose (opcional, para iniciar la aplicación y MySQL en contenedores)
 
@@ -80,16 +80,46 @@ Para agregar una pantalla:
 3. Declara la ruta en `app/routes/web.php` y asígnale un nombre.
 4. Agrega CSS, JavaScript o imágenes públicas bajo `app/public/`.
 
-Las rutas relacionan un método HTTP y una URL con una acción de controlador. Por ejemplo:
+Las rutas relacionan un método HTTP y una URL con una acción de controlador. Además de `get()` y `post()`, el router permite `put()` para actualizar recursos y `delete()` para eliminarlos:
 
 ```php
-use controllers\HelpController;
+use controllers\UserController;
 
-$router->get('/ayuda', [HelpController::class, 'index'])
-       ->name('help');
+$router->put('/usuarios/{id}', [UserController::class, 'update'])
+       ->name('user.update');
+
+$router->delete('/usuarios/{id}', [UserController::class, 'delete'])
+       ->name('user.delete');
 ```
 
-En una vista, genera enlaces con el nombre de la ruta:
+Los formularios HTML solo admiten GET y POST. Para enviar PUT o DELETE desde un formulario, usa POST con un campo oculto `_method`; el router acepta `PUT` y `DELETE` como valores. Desde JavaScript puedes enviar los métodos HTTP directamente, por ejemplo con Axios:
+
+```html
+<form method="post" action="<?= route('user.update', ['id' => $id]) ?>">
+    <input type="hidden" name="_method" value="PUT">
+    <!-- Incluye aquí el token CSRF según la configuración de la aplicación. -->
+    <input type="text" name="nombre" value="<?= htmlspecialchars($nombre) ?>">
+    <button type="submit">Guardar</button>
+</form>
+```
+
+Para usar Axios, instálalo con `npm install axios`. Agrega una URL base a la lista `APP_ROUTES` en `app/resources/layouts/main_foot.php` (por ejemplo, `'users' => rtrim(BASE_URL, '/') . '/usuarios'`) y úsala para construir la URL del recurso:
+
+```js
+import axios from 'axios';
+
+const userUrl = `${app.routes.users}/${encodeURIComponent(userId)}`;
+
+// Envía los campos del recurso en el cuerpo JSON de PUT.
+await axios.put(userUrl, { nombre: 'Ada Lovelace' });
+
+// Envía DELETE al mismo recurso.
+await axios.delete(userUrl);
+```
+
+En una acción PUT que recibe JSON, decodifica el cuerpo con `json_decode(file_get_contents('php://input'), true)`. Las acciones que modifican datos también deben validar el token CSRF de la aplicación.
+
+En una vista, genera enlaces a rutas GET con el nombre de la ruta:
 
 ```php
 <a href="<?= route('help') ?>">Ayuda</a>

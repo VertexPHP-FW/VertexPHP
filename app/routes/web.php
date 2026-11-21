@@ -10,7 +10,7 @@ use controllers\auth\SessionController;
 $router->get('/', [HomeController::class, 'index'])->name('home');
 $router->get('/ayuda', [HelpController::class, 'index'])->name('help');
 
-// Las páginas se consultan con GET y los formularios envían datos con POST.
+// GET consulta páginas; POST, PUT y DELETE atienden operaciones de escritura.
 $router->get('/sesion', [SessionController::class, 'index'])->name('session.index');
 $router->get('/iniciar-sesion', [SessionController::class, 'iniSession'])->name('login');
 $router->post('/iniciar-sesion', [SessionController::class, 'userAuth'])->name('login.submit');

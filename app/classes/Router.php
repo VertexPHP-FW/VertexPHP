@@ -34,6 +34,16 @@ class Router {
         return $this->add('POST', $path, $action);
     }
 
+    /** Registra una ruta para una petición PUT. */
+    public function put(string $path, array $action): RouteDefinition {
+        return $this->add('PUT', $path, $action);
+    }
+
+    /** Registra una ruta para una petición DELETE. */
+    public function delete(string $path, array $action): RouteDefinition {
+        return $this->add('DELETE', $path, $action);
+    }
+
     /**
      * Guarda una ruta. La acción tiene la forma [Controlador::class, 'metodo'].
      */
@@ -92,7 +102,8 @@ class Router {
 
     /** Busca y ejecuta la ruta que corresponde a la petición actual. */
     public function dispatch(): void {
-        $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+        $method = $this->getRequestMethod();
+        $_SERVER['REQUEST_METHOD'] = $method;
         $requestPath = $this->getRequestPath();
         $pathMatched = false;
         $allowedMethods = [];
@@ -122,6 +133,18 @@ class Router {
         }
 
         (new ErrorController())->error404();
+    }
+
+    /** Acepta _method en formularios POST para emular PUT o DELETE. */
+    private function getRequestMethod(): string {
+        $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+
+        if ($method !== 'POST' || !isset($_POST['_method']) || !is_string($_POST['_method'])) {
+            return $method;
+        }
+
+        $override = strtoupper(trim($_POST['_method']));
+        return in_array($override, ['PUT', 'DELETE'], true) ? $override : $method;
     }
 
     /** Obtiene la parte de la URL que se compara con las rutas. */
